@@ -25,6 +25,12 @@ namespace PatHead.StorageService.Util.Test
             };
         }
 
+        [Test]
+        public async Task TestCreateBucket()
+        {
+            var pushStream = await AwsS3Service.CreateBucket("ssss", _model);
+            Assert.True(pushStream);
+        }
 
         [Test]
         public async Task TestStaticPushStream()
@@ -39,7 +45,7 @@ namespace PatHead.StorageService.Util.Test
             }
 
             var pushStream = await AwsS3Service.PushStream(
-                FileFullName, "",
+                $"path/path/{FileFullName}", "help-center",
                 memoryStream, _model);
 
             Assert.True(pushStream);

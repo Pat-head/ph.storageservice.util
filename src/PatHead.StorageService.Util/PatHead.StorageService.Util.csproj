@@ -3,8 +3,20 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <PackageVersion>1.0.0</PackageVersion>
-        <Version>1.0.0</Version>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Version>1.0.0.1</Version>
+        <AssemblyName>PatHead.StorageService.Util</AssemblyName>
+        <RootNamespace>PatHead.StorageService.Util</RootNamespace>
+        <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
+        <Description>
+            Storage Service Util
+        </Description>
+        <Authors>PatHead</Authors>
+        <Owners>PatHead</Owners>
+        <Title>PatHead.StorageService.Util</Title>
+        <Summary>Storage Service Util</Summary>
+        <RepositoryUrl>https://github.com/Pat-head/ph.storageservice.util</RepositoryUrl>
+        <PackageId>PatHead.StorageService.Util</PackageId>
     </PropertyGroup>
 
     <ItemGroup>

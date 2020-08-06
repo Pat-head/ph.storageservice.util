@@ -93,5 +93,47 @@ namespace PatHead.StorageService.Util.S3
                 return false;
             }
         }
+
+        public static async Task<bool> CreateBucket(string bucketName, AuthorizationModel model,
+            AwsS3ConfigModel configModel = null)
+
+        {
+            if (model == null)
+            {
+                throw new Exception("model is null");
+            }
+
+            if (configModel == null)
+            {
+                configModel = new AwsS3ConfigModel();
+            }
+
+            if (string.IsNullOrWhiteSpace(bucketName))
+            {
+                bucketName = "storage";
+            }
+
+            AmazonS3Config config = new AmazonS3Config
+            {
+                ServiceURL = model.ServiceURL,
+                UseHttp = configModel.UseHttp,
+                ForcePathStyle = configModel.ForcePathStyle,
+                SignatureVersion = configModel.SignatureVersion
+            };
+
+            try
+            {
+                using (var s3Client = new AmazonS3Client(model.AccessKey, model.SecretAccessKey, config))
+                {
+                    await s3Client.PutBucketAsync(bucketName);
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.Write(e);
+                return false;
+            }
+        }
     }
 }
