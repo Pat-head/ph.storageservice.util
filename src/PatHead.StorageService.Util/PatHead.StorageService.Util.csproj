@@ -1,10 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>1.0.0.1</Version>
+        <Version>1.1.0.0</Version>
         <AssemblyName>PatHead.StorageService.Util</AssemblyName>
         <RootNamespace>PatHead.StorageService.Util</RootNamespace>
         <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
@@ -20,9 +19,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="AWSSDK.S3" Version="3.3.111.20" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.5" />
-      <PackageReference Include="MimeMapping" Version="1.0.1.30" />
+        <PackageReference Include="Minio" Version="3.1.13" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.5" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.5" />
     </ItemGroup>
 
 </Project>
