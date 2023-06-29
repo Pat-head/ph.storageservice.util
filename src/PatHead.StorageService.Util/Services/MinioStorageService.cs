@@ -52,5 +52,10 @@ namespace PatHead.StorageService.Util.Services
                 memoryStream.Position = 0;
             });
         }
+
+        public Task DeleteObjectAsync(string bucketName, string objectName)
+        {
+            return _minioClient.RemoveIncompleteUploadAsync(bucketName, objectName);
+        }
     }
 }

@@ -12,5 +12,7 @@ namespace PatHead.StorageService.Util.Services
         Task PutObjectAsync(string bucketName, string objectName, byte[] bytes);
 
         Task GetObjectAsync(string bucketName, string objectName, MemoryStream outputMemoryStream);
+        
+        Task DeleteObjectAsync(string bucketName, string objectName);
     }
 }
