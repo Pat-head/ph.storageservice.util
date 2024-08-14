@@ -29,10 +29,10 @@ jobs:
         with:
           dotnet-version: 7.0.x
       - name: Restore dependencies
-        run: dotnet restore ./src/Templates/FluentConsole.Templates.csproj
+        run: dotnet restore ./src/PatHead.StorageService.Util/PatHead.StorageService.Util.csproj
       - name: Build
-        run: dotnet build --no-restore -c Release ./src/Templates/FluentConsole.Templates.csproj
+        run: dotnet build --no-restore -c Release ./src/PatHead.StorageService.Util/PatHead.StorageService.Util.csproj
       - name: Create the package
-        run: dotnet pack -c Release ./src/Templates/FluentConsole.Templates.csproj
+        run: dotnet pack -c Release ./src/PatHead.StorageService.Util/PatHead.StorageService.Util.csproj
       - name: Publish the package to Github Packages
-        run: dotnet nuget push ./src/Templates/bin/Release/*.nupkg --api-key ${{ env.NUGET_TOKEN }} -s https://api.nuget.org/v3/index.json --skip-duplicate
+        run: dotnet nuget push ./src/PatHead.StorageService.Util/bin/Release/*.nupkg --api-key ${{ env.NUGET_TOKEN }} -s https://api.nuget.org/v3/index.json --skip-duplicate
