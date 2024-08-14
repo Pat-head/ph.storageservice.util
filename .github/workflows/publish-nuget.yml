@@ -35,4 +35,6 @@ jobs:
       - name: Create the package
         run: dotnet pack -c Release ./src/PatHead.StorageService.Util/PatHead.StorageService.Util.csproj
       - name: Publish the package to Github Packages
-        run: dotnet nuget push ./src/PatHead.StorageService.Util/bin/Release/*.nupkg --api-key ${{ vars.NUGET_TOKEN }} -s https://api.nuget.org/v3/index.json --skip-duplicate
+        run: |
+          cd ./src/PatHead.StorageService.Util/bin/Release
+          dotnet nuget push "*.nupkg" --api-key ${{ vars.NUGET_TOKEN }} -s https://api.nuget.org/v3/index.json --skip-duplicate
