@@ -1,27 +1,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <OutputType>Exe</OutputType>
 
-        <IsPackable>false</IsPackable>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
 
         <RootNamespace>PatHead.StorageService.Util.Test</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="nunit" Version="3.12.0" />
-        <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.7"/>
+        <PackageReference Include="PatHead.Basic.Util" Version="0.0.0.10"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\PatHead.StorageService.Util\PatHead.StorageService.Util.csproj" />
+        <ProjectReference Include="..\..\src\PatHead.StorageService.Util\PatHead.StorageService.Util.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="test_pic_1.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
+        <None Update="test_pic_1.png">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="appsettings.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>
