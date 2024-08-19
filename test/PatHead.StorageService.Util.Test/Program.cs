@@ -45,51 +45,60 @@ namespace PatHead.StorageService.Util.Test
 
         public async Task DoIt()
         {
-            var storageFactoryService = _serviceProvider.GetService<StorageFactoryService>();
-            using var stmMemory = new MemoryStream();
-
-            var minioStorageService = storageFactoryService.GetStorageService<MinioStorageService>();
-
-            var allBucketListAsync = await minioStorageService.GetAllBucketListAsync();
-
-            const string bucketName = "demo-test";
-
-            var bucketExistsAsync = await minioStorageService.BucketExistsAsync(bucketName);
-
-            if (!bucketExistsAsync) Console.WriteLine("bucket not exist");
-
-            await minioStorageService.CreateBucketAsync(bucketName);
-
-            var bucketExists2Async = await minioStorageService.BucketExistsAsync(bucketName);
-
-            if (bucketExists2Async) Console.WriteLine("bucket create");
-
-            const string fileName = "test.txt";
-
+            try
             {
-                using MemoryStream memoryStream = new MemoryStream();
-                await using (StreamWriter streamWriter = new StreamWriter(memoryStream))
+                var storageFactoryService = _serviceProvider.GetService<StorageFactoryService>();
+                using var stmMemory = new MemoryStream();
+
+                var minioStorageService = storageFactoryService.GetStorageService<MinioStorageService>();
+
+                var allBucketListAsync = await minioStorageService.GetAllBucketListAsync();
+
+                const string bucketName = "demo-test";
+
+                var bucketExistsAsync = await minioStorageService.BucketExistsAsync(bucketName);
+
+                if (!bucketExistsAsync) Console.WriteLine("bucket not exist");
+
+                await minioStorageService.CreateBucketAsync(bucketName);
+
+                var bucketExists2Async = await minioStorageService.BucketExistsAsync(bucketName);
+
+                if (bucketExists2Async) Console.WriteLine("bucket create");
+
+                const string fileName = "test.txt";
+
                 {
-                    await streamWriter.WriteAsync("hello minio");
-                    await streamWriter.FlushAsync();
+                    using MemoryStream memoryStream = new MemoryStream();
+                    await using (StreamWriter streamWriter = new StreamWriter(memoryStream))
+                    {
+                        await streamWriter.WriteAsync("hello minio");
+                        await streamWriter.FlushAsync();
+                    }
+
+                    await minioStorageService.PutObjectAsync(bucketName, fileName, memoryStream.ToArray());
+                    Console.WriteLine("pull test.txt to bucket");
                 }
 
-                await minioStorageService.PutObjectAsync(bucketName, fileName, memoryStream.ToArray());
-                Console.WriteLine("pull test.txt to bucket");
-            }
+                {
+                    using MemoryStream memoryStream = new MemoryStream();
+                    await minioStorageService.GetObjectAsync(bucketName, fileName, memoryStream);
+                    Console.WriteLine("get test.txt from bucket:");
+                    await memoryStream.CopyToAsync(Console.OpenStandardOutput());
+                }
 
+                await minioStorageService.DeleteObjectAsync(bucketName, fileName);
+                Console.WriteLine();
+                Console.WriteLine("delete test.txt");
+
+                await minioStorageService.DeleteBucketAsync(bucketName);
+                Console.WriteLine("delete bucket");
+            }
+            catch (Exception e)
             {
-                using MemoryStream memoryStream = new MemoryStream();
-                await minioStorageService.GetObjectAsync(bucketName, fileName, memoryStream);
-                Console.WriteLine("get test.txt from bucket:");
-                await memoryStream.CopyToAsync(Console.OpenStandardOutput());
+                Console.WriteLine(e);
+                throw;
             }
-
-            await minioStorageService.DeleteObjectAsync(bucketName, fileName);
-            Console.WriteLine("delete test.txt");
-
-            await minioStorageService.DeleteBucketAsync(bucketName);
-            Console.WriteLine("delete bucket");
         }
     }
 }

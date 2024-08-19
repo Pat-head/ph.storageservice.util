@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Minio;
@@ -19,58 +20,82 @@ namespace PatHead.StorageService.Util.Services
 
             var optionsValue = options.Value;
 
-            _minioClient = new MinioClient(
-                optionsValue.Endpoint,
-                optionsValue.AccessKey,
-                optionsValue.SecretKey);
+            _minioClient = new MinioClient()
+                .WithEndpoint(optionsValue.Endpoint)
+                .WithCredentials(optionsValue.AccessKey, optionsValue.SecretKey);
 
-            _minioClient.WithSSL();
-
-            if (!optionsValue.CertificateVerification)
+            if (optionsValue.SSL)
             {
-                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+                _minioClient.WithSSL();
+
+                if (!optionsValue.CertificateVerification)
+                {
+                    _minioClient.WithHttpClient(new HttpClient(new HttpClientHandler()
+                    {
+                        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                    }));
+                }
             }
+            _minioClient = _minioClient.Build();
         }
 
         public async Task<bool> BucketExistsAsync(string bucketName)
         {
-            return await _minioClient.BucketExistsAsync(bucketName).ConfigureAwait(false);
+            var bucketExistsArgs = new BucketExistsArgs()
+                .WithBucket(bucketName);
+            return await _minioClient.BucketExistsAsync(bucketExistsArgs).ConfigureAwait(false);
         }
 
         public async Task CreateBucketAsync(string bucketName)
         {
-            var found = await _minioClient.BucketExistsAsync(bucketName).ConfigureAwait(false);
+            var found = await BucketExistsAsync(bucketName).ConfigureAwait(false);
             if (!found)
             {
-                await _minioClient.MakeBucketAsync(bucketName).ConfigureAwait(false);
+                MakeBucketArgs args = new MakeBucketArgs().WithBucket(bucketName);
+                await _minioClient.MakeBucketAsync(args).ConfigureAwait(false);
             }
         }
 
         public Task DeleteBucketAsync(string bucketName)
         {
-            return _minioClient.RemoveBucketAsync(bucketName);
+            return _minioClient.RemoveBucketAsync(new RemoveBucketArgs().WithBucket(bucketName));
         }
 
         public async Task PutObjectAsync(string bucketName, string fileName, byte[] bytes)
         {
             using (Stream stream = new MemoryStream(bytes))
             {
-                await _minioClient.PutObjectAsync(bucketName, fileName, stream, stream.Length).ConfigureAwait(false);
+                var putObjectArgs = new PutObjectArgs()
+                    .WithBucket(bucketName)
+                    .WithStreamData(stream)
+                    .WithObjectSize(stream.Length)
+                    .WithObject(fileName);
+
+                await _minioClient.PutObjectAsync(putObjectArgs).ConfigureAwait(false);
             }
         }
 
-        public Task GetObjectAsync(string bucketName, string fileName, MemoryStream outMemoryStream)
+        public async Task GetObjectAsync(string bucketName, string fileName, MemoryStream outMemoryStream)
         {
-            return _minioClient.GetObjectAsync(bucketName, fileName, stream =>
-            {
-                stream.CopyTo(outMemoryStream);
-                outMemoryStream.Position = 0;
-            });
+            var getObjectArgs = new GetObjectArgs()
+                .WithBucket(bucketName)
+                .WithObject(fileName)
+                .WithCallbackStream(stream =>
+                {
+                    stream.CopyTo(outMemoryStream);
+                    outMemoryStream.Position = 0;
+                });
+
+            await _minioClient.GetObjectAsync(getObjectArgs);
         }
 
         public Task DeleteObjectAsync(string bucketName, string objectName)
         {
-            return _minioClient.RemoveObjectAsync(bucketName, objectName);
+            var removeObjectArgs = new RemoveObjectArgs()
+                .WithBucket(bucketName)
+                .WithObject(objectName);
+
+            return _minioClient.RemoveObjectAsync(removeObjectArgs);
         }
 
         public async Task<List<BucketDTO>> GetAllBucketListAsync()

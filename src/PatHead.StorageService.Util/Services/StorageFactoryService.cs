@@ -20,7 +20,6 @@ namespace PatHead.StorageService.Util.Services
                     return storageService;
                 }
             }
-
             return null;
         }
     }

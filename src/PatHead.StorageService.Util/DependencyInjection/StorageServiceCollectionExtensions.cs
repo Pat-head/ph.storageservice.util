@@ -14,6 +14,7 @@ namespace PatHead.StorageService.Util.DependencyInjection
             services.Configure(setupAction);
             services.AddTransient<StorageFactoryService>();
             services.AddTransient<IStorageService, MinioStorageService>();
+            services.AddTransient<IStorageService, AmazonS3StorageService>();
         }
     }
 }
